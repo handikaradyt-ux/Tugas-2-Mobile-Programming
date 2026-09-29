@@ -28,6 +28,14 @@ class _HomePageState extends State<HomePage> {
     _mahasiswaRepo = InMemoryMahasiswaRepository();
     _mataKuliahRepo = InMemoryMataKuliahRepository();
     _barangRepo = InMemoryBarangRepository();
+
+    final tabParam = Uri.base.queryParameters['tab'];
+    if (tabParam != null) {
+      final tabIdx = int.tryParse(tabParam);
+      if (tabIdx != null && tabIdx >= 0 && tabIdx <= 3) {
+        _currentIndex = tabIdx;
+      }
+    }
   }
 
   @override

@@ -17,6 +17,27 @@ class _InventoryPageState extends State<InventoryPage> {
   String _keyword = '';
   final TextEditingController _searchController = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+    final q = Uri.base.queryParameters;
+    if (q['inv_search'] != null) {
+      _keyword = q['inv_search']!;
+      _searchController.text = _keyword;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (q['inv_action'] == 'tambah') {
+        _tambahData();
+      } else if (q['inv_action'] == 'edit') {
+        final list = widget.repository.getAll();
+        if (list.isNotEmpty) _editData(list.first);
+      } else if (q['inv_action'] == 'delete') {
+        final list = widget.repository.getAll();
+        if (list.isNotEmpty) _hapusData(list.first);
+      }
+    });
+  }
+
   List<Barang> get _dataTampil {
     return widget.repository.getFiltered(keyword: _keyword);
   }

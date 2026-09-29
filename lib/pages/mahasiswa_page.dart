@@ -19,6 +19,50 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
   String _sortBy = 'Nama A-Z';
   final TextEditingController _searchController = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+    final q = Uri.base.queryParameters;
+    if (q['m_search'] != null) {
+      _keyword = q['m_search']!;
+      _searchController.text = _keyword;
+    }
+    if (q['m_filter'] != null) {
+      _filterIpk = q['m_filter']!;
+    }
+    if (q['m_sort'] != null) {
+      _sortBy = q['m_sort']!;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (q['m_action'] == 'tambah') {
+        _tambahData();
+      } else if (q['m_action'] == 'edit') {
+        final list = widget.repository.getAll();
+        if (list.isNotEmpty) _editData(list.first);
+      } else if (q['m_action'] == 'delete') {
+        final list = widget.repository.getAll();
+        if (list.isNotEmpty) _hapusData(list.first);
+      } else if (q['m_action'] == 'added_sample') {
+        widget.repository.add(Mahasiswa(
+          nim: '23010099',
+          nama: 'Zulfa Maharani',
+          prodi: 'Teknik Informatika',
+          semester: 5,
+          ipk: 3.90,
+        ));
+        setState(() {});
+      } else if (q['m_action'] == 'edited_sample') {
+        final first = widget.repository.getAll().first;
+        widget.repository.update(first.copyWith(nama: '${first.nama} S.Kom', ipk: 3.95), oldNim: first.nim);
+        setState(() {});
+      } else if (q['m_action'] == 'deleted_sample') {
+        final first = widget.repository.getAll().first;
+        widget.repository.delete(first);
+        setState(() {});
+      }
+    });
+  }
+
   List<Mahasiswa> get _dataTampil {
     return widget.repository.getFilteredAndSorted(
       keyword: _keyword,

@@ -19,6 +19,33 @@ class _MataKuliahPageState extends State<MataKuliahPage> {
   String _sortBy = 'Nama A-Z';
   final TextEditingController _searchController = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+    final q = Uri.base.queryParameters;
+    if (q['mk_search'] != null) {
+      _keyword = q['mk_search']!;
+      _searchController.text = _keyword;
+    }
+    if (q['mk_filter'] != null) {
+      _filterSks = q['mk_filter']!;
+    }
+    if (q['mk_sort'] != null) {
+      _sortBy = q['mk_sort']!;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (q['mk_action'] == 'tambah') {
+        _tambahData();
+      } else if (q['mk_action'] == 'edit') {
+        final list = widget.repository.getAll();
+        if (list.isNotEmpty) _editData(list.first);
+      } else if (q['mk_action'] == 'delete') {
+        final list = widget.repository.getAll();
+        if (list.isNotEmpty) _hapusData(list.first);
+      }
+    });
+  }
+
   List<MataKuliah> get _dataTampil {
     return widget.repository.getFilteredAndSorted(
       keyword: _keyword,
